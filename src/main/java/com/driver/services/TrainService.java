@@ -48,7 +48,6 @@ public class TrainService {
         //Now save the object
 
         return trainRepository.save(train).getTrainId();
-
     }
 
     public Integer calculateAvailableSeats(SeatAvailabilityEntryDto seatAvailabilityEntryDto){
@@ -65,7 +64,6 @@ public class TrainService {
         //My Code//
         //Get the train
         Train train = trainRepository.findById(seatAvailabilityEntryDto.getTrainId()).get();
-
 
         String[] route = train.getRoute().split(",");
         int[] arr = new int[route.length];

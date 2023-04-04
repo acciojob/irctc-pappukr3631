@@ -47,15 +47,9 @@ public class TicketService {
        //And the end return the ticketId that has come from db
 
         //My Code Starts Here//
-
+        //Getting train from DB
         Train train = trainRepository.findById(bookTicketEntryDto.getTrainId()).get();
-        Passenger bookingPerson = passengerRepository.findById(bookTicketEntryDto.getBookingPersonId()).get();
-        //Making the passengers list
-        List<Passenger> passengerList = new ArrayList<>();
-        for(int id : bookTicketEntryDto.getPassengerIds()) {
-            passengerList.add(passengerRepository.findById(id).get());
-        }
-
+        //List of tickets booked
         List<Ticket> bookedTicketList;
         if(train.getBookedTickets() == null){
             bookedTicketList = new ArrayList<>();
@@ -63,31 +57,42 @@ public class TicketService {
         else{
             bookedTicketList = train.getBookedTickets();
         }
-        String sourceStation = bookTicketEntryDto.getFromStation().toString();
-        String destinationStation = bookTicketEntryDto.getToStation().toString();
-
-        //
-//        if(!train.getRoute().contains(sourceStation) || !train.getRoute().contains(destinationStation)){
-//            throw new Exception("No value present");
-//        }
-
-        SeatAvailabilityEntryDto seatAvailabilityEntryDto = new SeatAvailabilityEntryDto(train.getTrainId(),bookTicketEntryDto.getFromStation(),bookTicketEntryDto.getToStation());
+        //Checking seat availability
+        SeatAvailabilityEntryDto seatAvailabilityEntryDto = new SeatAvailabilityEntryDto();
+        seatAvailabilityEntryDto.setTrainId(bookTicketEntryDto.getTrainId());
+        seatAvailabilityEntryDto.setFromStation(bookTicketEntryDto.getFromStation());
+        seatAvailabilityEntryDto.setToStation(bookTicketEntryDto.getToStation());
         int noOfAvailableSeats = trainService.calculateAvailableSeats(seatAvailabilityEntryDto);
 
         if(noOfAvailableSeats < bookTicketEntryDto.getNoOfSeats()) {
             throw new Exception("Less tickets are available");
         }
 
+
+        //Seats are available so, book the ticket
+
+        Passenger bookingPerson = passengerRepository.findById(bookTicketEntryDto.getBookingPersonId()).get();
+        //Making the passengers list
+        List<Passenger> passengerList = new ArrayList<>();
+        for(int id : bookTicketEntryDto.getPassengerIds()) {
+            passengerList.add(passengerRepository.findById(id).get());
+        }
+
+
         //
         Ticket ticket = new Ticket();
         ticket.setFromStation(bookTicketEntryDto.getFromStation());
         ticket.setToStation((bookTicketEntryDto.getToStation()));
         ticket.setPassengersList(passengerList);
+        ticket.setTrain(train);
         //calculate fare and set
-        ticket.setTotalFare(trainService.calculateFare(train.getTrainId(),sourceStation,destinationStation));
+        String sourceStation = bookTicketEntryDto.getFromStation().toString();
+        String destinationStation = bookTicketEntryDto.getToStation().toString();
+        ticket.setTotalFare(trainService.calculateFare(train.getTrainId(),sourceStation,destinationStation)*bookTicketEntryDto.getNoOfSeats());
 
         bookingPerson.getBookedTickets().add(ticket);
-        train.getBookedTickets().add(ticket);
+        bookedTicketList.add(ticket);
+        train.setBookedTickets(bookedTicketList);
 
         //
         trainRepository.save(train);
