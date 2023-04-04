@@ -49,15 +49,9 @@ public class TicketService {
         //My Code Starts Here//
         //Getting train from DB
         Train train = trainRepository.findById(bookTicketEntryDto.getTrainId()).get();
-        //List of tickets booked
-        List<Ticket> bookedTicketList;
-        if(train.getBookedTickets() == null){
-            bookedTicketList = new ArrayList<>();
-        }
-        else{
-            bookedTicketList = train.getBookedTickets();
-        }
+
         //Checking seat availability
+
         SeatAvailabilityEntryDto seatAvailabilityEntryDto = new SeatAvailabilityEntryDto();
         seatAvailabilityEntryDto.setTrainId(bookTicketEntryDto.getTrainId());
         seatAvailabilityEntryDto.setFromStation(bookTicketEntryDto.getFromStation());
@@ -65,7 +59,8 @@ public class TicketService {
         int noOfAvailableSeats = trainService.calculateAvailableSeats(seatAvailabilityEntryDto);
 
         if(noOfAvailableSeats < bookTicketEntryDto.getNoOfSeats()) {
-            throw new Exception("Less tickets are available");
+//            throw new Exception("Less tickets are available");
+            throw new Exception("Less tickets available");
         }
 
 
@@ -91,15 +86,14 @@ public class TicketService {
         ticket.setTotalFare(trainService.calculateFare(train.getTrainId(),sourceStation,destinationStation)*bookTicketEntryDto.getNoOfSeats());
 
         bookingPerson.getBookedTickets().add(ticket);
-        bookedTicketList.add(ticket);
-        train.setBookedTickets(bookedTicketList);
+        train.getBookedTickets().add(ticket);
 
         //
         trainRepository.save(train);
 //        ticketRepository.save(ticket);
 //        passengerRepository.save(bookingPerson);
 
-       return ticket.getTicketId();
+       return ticketRepository.save(ticket).getTicketId();
 
     }
 }
