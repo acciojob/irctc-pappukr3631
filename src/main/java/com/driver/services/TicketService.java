@@ -56,7 +56,13 @@ public class TicketService {
             passengerList.add(passengerRepository.findById(id).get());
         }
 
-        List<Ticket> bookedTicketList = train.getBookedTickets();
+        List<Ticket> bookedTicketList;
+        if(train.getBookedTickets() == null){
+            bookedTicketList = new ArrayList<>();
+        }
+        else{
+            bookedTicketList = train.getBookedTickets();
+        }
         String sourceStation = bookTicketEntryDto.getFromStation().toString();
         String destinationStation = bookTicketEntryDto.getToStation().toString();
 
