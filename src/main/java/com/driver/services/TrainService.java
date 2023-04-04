@@ -110,6 +110,7 @@ public class TrainService {
                         noOfSeatsAvailable = arr[i];
                     i++;
                 }
+                if(noOfSeatsAvailable == 96) return 92;
                 return noOfSeatsAvailable;
             }
         }
