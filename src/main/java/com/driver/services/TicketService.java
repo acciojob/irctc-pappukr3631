@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -50,6 +51,14 @@ public class TicketService {
         //Getting train from DB
         Train train = trainRepository.findById(bookTicketEntryDto.getTrainId()).get();
 
+        //Check stations
+        List<String> route = Arrays.asList(train.getRoute().split(","));
+        int from = route.indexOf(bookTicketEntryDto.getFromStation().toString());
+        int to = route.indexOf(bookTicketEntryDto.getToStation().toString());
+        if(from == -1 || to == -1 || to <= from) {
+            throw new Exception("Invalid stations");
+        }
+
         //Checking seat availability
 
         SeatAvailabilityEntryDto seatAvailabilityEntryDto = new SeatAvailabilityEntryDto();
@@ -59,8 +68,7 @@ public class TicketService {
         int noOfAvailableSeats = trainService.calculateAvailableSeats(seatAvailabilityEntryDto);
 
         if(noOfAvailableSeats < bookTicketEntryDto.getNoOfSeats()) {
-//            throw new Exception("Less tickets are available");
-            throw new Exception("Less tickets available");
+            throw new Exception("Less tickets are available");
         }
 
 
