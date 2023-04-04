@@ -25,12 +25,12 @@ public class Passenger {
 
     //passengers and tickets are many to manny
 
-    public Passenger() {
-    }
-
     @ManyToMany
     @JoinColumn
     private List<Ticket> bookedTickets;
+
+    public Passenger() {
+    }
 
     public Passenger(int passengerId, String name, int age, List<Ticket> bookedTickets) {
         this.passengerId = passengerId;
