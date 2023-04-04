@@ -47,9 +47,8 @@ public class TrainService {
         //All attributes are set
         //Now save the object
 
-        trainRepository.save(train);
+        return trainRepository.save(train).getTrainId();
 
-        return train.getTrainId();
     }
 
     public Integer calculateAvailableSeats(SeatAvailabilityEntryDto seatAvailabilityEntryDto){
@@ -72,8 +71,6 @@ public class TrainService {
         int[] arr = new int[route.length];
         Arrays.fill(arr, train.getNoOfSeats());
 
-        //
-        int noOfSeatsAvailable = 0;
 
         //Get list of booked tickets
         List<Ticket> bookedTickets = train.getBookedTickets();
@@ -91,19 +88,25 @@ public class TrainService {
                 }
             }
         }
+
+        //
+        int noOfSeatsAvailable;
+
         String source = seatAvailabilityEntryDto.getFromStation().toString();
         String destination = seatAvailabilityEntryDto.getFromStation().toString();
         for(int i=0; i<arr.length; i++) {
             if(Objects.equals(route[i],source)) {
-                noOfSeatsAvailable += arr[i++];
+                noOfSeatsAvailable = arr[i++];
                 while (i<arr.length && !Objects.equals(route[i],destination)) {
-                    noOfSeatsAvailable += arr[i++];
+                    if(noOfSeatsAvailable > arr[i])
+                        noOfSeatsAvailable = arr[i];
+                    i++;
                 }
-                break;
+                return noOfSeatsAvailable;
             }
         }
 
-       return noOfSeatsAvailable;
+       return 0;
     }
 
     public Integer calculatePeopleBoardingAtAStation(Integer trainId,Station station) throws Exception{

@@ -50,10 +50,20 @@ public class TicketService {
 
         Train train = trainRepository.findById(bookTicketEntryDto.getTrainId()).get();
         Passenger bookingPerson = passengerRepository.findById(bookTicketEntryDto.getBookingPersonId()).get();
+        //Making the passengers list
+        List<Passenger> passengerList = new ArrayList<>();
+        for(int id : bookTicketEntryDto.getPassengerIds()) {
+            passengerList.add(passengerRepository.findById(id).get());
+        }
 
         List<Ticket> bookedTicketList = train.getBookedTickets();
         String sourceStation = bookTicketEntryDto.getFromStation().toString();
         String destinationStation = bookTicketEntryDto.getToStation().toString();
+
+        //
+//        if(!train.getRoute().contains(sourceStation) || !train.getRoute().contains(destinationStation)){
+//            throw new Exception("No value present");
+//        }
 
         SeatAvailabilityEntryDto seatAvailabilityEntryDto = new SeatAvailabilityEntryDto(train.getTrainId(),bookTicketEntryDto.getFromStation(),bookTicketEntryDto.getToStation());
         int noOfAvailableSeats = trainService.calculateAvailableSeats(seatAvailabilityEntryDto);
@@ -66,10 +76,6 @@ public class TicketService {
         Ticket ticket = new Ticket();
         ticket.setFromStation(bookTicketEntryDto.getFromStation());
         ticket.setToStation((bookTicketEntryDto.getToStation()));
-        List<Passenger> passengerList = new ArrayList<>();
-        for(int id : bookTicketEntryDto.getPassengerIds()) {
-            passengerList.add(passengerRepository.findById(id).get());
-        }
         ticket.setPassengersList(passengerList);
         //calculate fare and set
         ticket.setTotalFare(trainService.calculateFare(train.getTrainId(),sourceStation,destinationStation));
@@ -79,8 +85,8 @@ public class TicketService {
 
         //
         trainRepository.save(train);
-        ticketRepository.save(ticket);
-        passengerRepository.save(bookingPerson);
+//        ticketRepository.save(ticket);
+//        passengerRepository.save(bookingPerson);
 
        return ticket.getTicketId();
 
