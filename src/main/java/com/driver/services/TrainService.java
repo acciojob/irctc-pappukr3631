@@ -65,7 +65,7 @@ public class TrainService {
         //Get the train
         Train train = trainRepository.findById(seatAvailabilityEntryDto.getTrainId()).get();
 
-        /*String sourceStation = seatAvailabilityEntryDto.getFromStation().toString();
+        String sourceStation = seatAvailabilityEntryDto.getFromStation().toString();
         String destinationStation = seatAvailabilityEntryDto.getToStation().toString();
         //Check stations (Validating stations)
         List<String> routeList = Arrays.asList(train.getRoute().split(","));
@@ -73,7 +73,7 @@ public class TrainService {
         int to = routeList.indexOf(destinationStation);
         if(from == -1 || to == -1 || to <= from) {
             return 0;
-        }*/
+        }
 
         String[] route = train.getRoute().split(",");
         int[] arr = new int[route.length];
@@ -89,7 +89,7 @@ public class TrainService {
             for(int i=0; i<arr.length; i++) {
                 if(Objects.equals(route[i], source)) {
                     arr[i++] -= ticket.getPassengersList().size();
-                    while(!Objects.equals(route[i],destination)) {
+                    while(i < arr.length && !Objects.equals(route[i],destination)) {
                         arr[i++] -= ticket.getPassengersList().size();
                     }
                     break;
