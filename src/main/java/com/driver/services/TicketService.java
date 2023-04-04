@@ -2,7 +2,6 @@ package com.driver.services;
 
 
 import com.driver.EntryDto.BookTicketEntryDto;
-import com.driver.EntryDto.SeatAvailabilityEntryDto;
 import com.driver.model.Passenger;
 import com.driver.model.Ticket;
 import com.driver.model.Train;
@@ -54,7 +53,7 @@ public class TicketService {
         String sourceStation = bookTicketEntryDto.getFromStation().toString();
         String destinationStation = bookTicketEntryDto.getToStation().toString();
 
-        //Check stations(Validating stations)
+        //Check stations (Validating stations)
         List<String> route = Arrays.asList(train.getRoute().split(","));
         int from = route.indexOf(sourceStation);
         int to = route.indexOf(destinationStation);
@@ -64,11 +63,6 @@ public class TicketService {
 
 
         //Checking seat availability
-
-//        SeatAvailabilityEntryDto seatAvailabilityEntryDto = new SeatAvailabilityEntryDto();
-//        seatAvailabilityEntryDto.setTrainId(bookTicketEntryDto.getTrainId());
-//        seatAvailabilityEntryDto.setFromStation(bookTicketEntryDto.getFromStation());
-//        seatAvailabilityEntryDto.setToStation(bookTicketEntryDto.getToStation());
         int noOfBookedSeats = 0;
         List<Ticket> bookedTicketsList = train.getBookedTickets();
         for (Ticket ticket : bookedTicketsList) {
@@ -92,8 +86,7 @@ public class TicketService {
         Ticket ticket = new Ticket();
         ticket.setFromStation(bookTicketEntryDto.getFromStation());
         ticket.setToStation((bookTicketEntryDto.getToStation()));
-        //calculate fare and set
-        ticket.setTotalFare(trainService.calculateFare(train.getTrainId(),sourceStation,destinationStation)*bookTicketEntryDto.getNoOfSeats());
+        ticket.setTotalFare(300 * (route.indexOf(destinationStation) - route.indexOf(sourceStation)) * bookTicketEntryDto.getNoOfSeats());
 
         ticket.setPassengersList(passengerList);
         ticket.setTrain(train);
@@ -110,6 +103,5 @@ public class TicketService {
 //        passengerRepository.save(bookingPerson);
 
        return ticketRepository.save(ticket).getTicketId();
-
     }
 }
